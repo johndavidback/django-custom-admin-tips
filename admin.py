@@ -14,7 +14,7 @@ class MyUserAdmin(UserAdmin):
         Determine what fieldsets show up, this is what really limits the form for
         users of only staff status.
         """
-        if not obj:
+        if obj is None:
             return self.add_fieldsets
 
         if not request.user.is_superuser:
