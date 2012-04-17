@@ -43,3 +43,26 @@ class MyUserAdmin(UserAdmin):
 # and then re-register it with our custom ModelAdmin which extends the original.
 admin.site.unregister(User)
 admin.site.register(User, MyUserAdmin)
+
+
+# Let's say the same staffer above is only allowed to edit certain records that
+# belong to them.  Your model would look something like this:
+# class SomeModel(models.Model):
+#    owner = models.ForeignKey(User)
+#    ...
+
+from someapp.models import SomeModel
+
+class SomeModelAdmin(admin.ModelAdmin):
+
+    def queryset(self, request):
+        qs = super(SomeModelAdmin, self).queryset(request)
+
+        if request.user.is_superuser:
+            return qs
+
+        return qs.filter(owner=request.user)
+
+# And then we register it at the bottom, so qs gets the queryset from the correct
+# model and we are able to see who owns what record, and therefore filter it.
+admin.site.register(SomeModel, SomeModelAdmin)
