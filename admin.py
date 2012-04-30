@@ -66,3 +66,34 @@ class SomeModelAdmin(admin.ModelAdmin):
 # And then we register it at the bottom, so qs gets the queryset from the correct
 # model and we are able to see who owns what record, and therefore filter it.
 admin.site.register(SomeModel, SomeModelAdmin)
+
+
+# Order all the fields a certain way, let's say by name.  This will order all of your
+# fields by the name of the field you pick.
+class SomeModelAdmin(admin.ModelAdmin):
+
+    def queryset(self, request):
+        qs = super(SomeModelAdmin, self).queryset(request)
+
+        return qs.order_by('name')
+
+    # A more robust example of the one above, this is assuming you have a foreign key
+    # relationship and you need to span fields
+    # Ex: brand = models.ForeignKey(OtherModel)
+    # And you want to sort first by the brand's name, then by the name of the field
+    def queryset(self, request):
+        qs = super(SomeModelAdmin, self).queryset(request)
+
+        return qs.order_by('owner__name', 'name')
+
+    # That could give you results like this:
+    # conns: plain
+    # conns: sour cream
+    # grippos: barbecue
+    # grippos: french onion
+    # grippos: ranch
+    # lays: fiery mexican
+    # lays: hot italian
+
+    # Does that make sense?
+
